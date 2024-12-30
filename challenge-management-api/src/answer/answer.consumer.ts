@@ -1,17 +1,25 @@
-import { Controller, Logger } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { AnswerService } from './answer.service';
-import { KafkaContext } from 'src/kafka/kafka-context';
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import { AnswerStatus } from '@prisma/client';
+
+interface CorrectLessonResponse {
+  submissionId: string;
+  repositoryUrl: string;
+  grade: number;
+  status: 'Done' | 'Error' | 'Pending';
+}
 
 @Controller()
 export class AnswerConsumer {
-  private logger = new Logger(AnswerConsumer.name);
-
   constructor(private readonly answerService: AnswerService) {}
 
   @MessagePattern('challenge.corrected')
-  async challengeCorrected(@Payload() payload: KafkaContext) {
-    this.logger.log(`Received message from topic: ${payload.topic}`);
-    console.log(payload);
+  async challengeCorrected(@Payload() payload: CorrectLessonResponse) {
+    await this.answerService.update({
+      id: payload.submissionId,
+      score: payload.grade,
+      status: payload.status.toUpperCase() as AnswerStatus,
+    });
   }
 }
