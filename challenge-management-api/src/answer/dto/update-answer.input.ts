@@ -1,4 +1,4 @@
-import { AnswerStatusScalarType } from 'src/utils/custom-scalar-types';
+import { AnswerStatusScalarType } from '../../utils/custom-scalar-types';
 import { CreateAnswerInput } from './create-answer.input';
 import { InputType, Field, PartialType, Float } from '@nestjs/graphql';
 import { AnswerStatus } from '@prisma/client';

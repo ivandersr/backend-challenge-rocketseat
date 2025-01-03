@@ -7,7 +7,7 @@ import { ChallengePrismaRepository } from '../challenge/repositories/implementat
 import { AnswerConsumer } from './answer.consumer';
 import { ClientKafka, ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { sendMessageToTopic } from 'src/utils/send-to-topic';
+import { sendMessageToTopic } from '../utils/send-to-topic';
 
 @Module({
   imports: [

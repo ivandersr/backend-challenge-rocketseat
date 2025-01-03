@@ -3,7 +3,9 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 
-describe('AppController (e2e)', () => {
+const gql = '/graphql';
+
+describe('GraphqQL (e2e)', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
@@ -15,10 +17,23 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  afterAll(async () => {
+    await app.close();
+  });
+
+  describe(gql, () => {
+    describe('challenges', () => {
+      it('should get list of challenges', () => {
+        return request(app.getHttpServer())
+          .post(gql)
+          .send({
+            query: '{challenges { total }}',
+          })
+          .expect(200)
+          .expect((res) => {
+            expect(res.body.data.challenges.total).toBeDefined();
+          });
+      });
+    });
   });
 });

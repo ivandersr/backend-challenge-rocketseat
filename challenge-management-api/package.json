@@ -17,7 +17,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "DOTENV_CONFIG_PATH=.env.test jest --config ./test/jest-e2e.json --setupFiles=dotenv/config"
   },
   "dependencies": {
     "@apollo/server": "^4.11.2",
@@ -29,8 +29,10 @@
     "@nestjs/microservices": "^10.4.15",
     "@nestjs/platform-express": "^10.0.0",
     "@prisma/client": "6.1.0",
+    "dotenv": "^16.4.7",
     "graphql": "^16.10.0",
     "kafkajs": "^2.2.4",
+    "pg": "^8.13.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1"
   },
@@ -38,9 +40,11 @@
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
+    "@quramy/jest-prisma": "^1.8.1",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.1",
+    "@types/pg": "^8.11.10",
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
