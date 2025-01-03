@@ -1,11 +1,12 @@
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { AnswerRepository } from '../answer.repository';
-import { CreateAnswerRepositoryInput } from 'src/answer/dto/create-answer.repo.input';
-import { Answer } from 'src/answer/entities/answer.entity';
-import { parseFilters } from 'src/utils/parse-filters';
-import { UpdateAnswerRepositoryInput } from 'src/answer/dto/update-answer.repo.input';
+import { CreateAnswerRepositoryInput } from '../../dto/create-answer.repo.input';
+import { Answer } from '../../entities/answer.entity';
+import { parseFilters } from '../../../utils/parse-filters';
+import { UpdateAnswerRepositoryInput } from '../../dto/update-answer.repo.input';
 import { Injectable } from '@nestjs/common';
-import { ListAnswersRepositoryArgs } from 'src/answer/dto/List-answers.repo.args';
+import { ListAnswersRepositoryArgs } from '../../dto/List-answers.repo.args';
+import { AnswerPaginatedResponse } from 'src/answer/dto/paginated-response';
 
 @Injectable()
 export class AnswerPrismaRepository implements AnswerRepository {
@@ -29,7 +30,9 @@ export class AnswerPrismaRepository implements AnswerRepository {
     });
   }
 
-  async findMany(args: ListAnswersRepositoryArgs) {
+  async findMany(
+    args: ListAnswersRepositoryArgs,
+  ): Promise<AnswerPaginatedResponse> {
     const { skip, take, challengeId, status, startDate, endDate } = args;
 
     const queryArgs = {
@@ -58,8 +61,15 @@ export class AnswerPrismaRepository implements AnswerRepository {
         },
       ]),
     };
+    const [answers, count] = await this.prisma.$transaction([
+      this.prisma.answer.findMany(queryArgs),
+      this.prisma.answer.count({ where: queryArgs.where }),
+    ]);
 
-    return this.prisma.answer.findMany(queryArgs);
+    return {
+      total: count,
+      data: answers,
+    };
   }
 
   async update(input: UpdateAnswerRepositoryInput) {

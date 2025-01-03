@@ -7,7 +7,6 @@ import { AnswerRepository } from './repositories/answer.repository';
 import { ChallengeRepository } from 'src/challenge/repositories/challenge.repository';
 import { validateGitUrl } from '../utils/validate-git-url';
 import { ClientKafka } from '@nestjs/microservices';
-import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class AnswerService {
@@ -20,6 +19,9 @@ export class AnswerService {
 
     @Inject('KAFKA_PRODUCER')
     private producer: ClientKafka,
+
+    @Inject('sendMessage')
+    private sendMessageToTopic: (args) => void,
   ) {}
   async create(createAnswerInput: CreateAnswerInput) {
     const { challengeId, repositoryUrl } = createAnswerInput;
@@ -47,7 +49,14 @@ export class AnswerService {
     });
 
     if (answer.status === AnswerStatus.PENDING) {
-      this.sendChallengeToTopic(answer.id, repositoryUrl);
+      this.sendMessageToTopic({
+        topic: 'challenge.correction',
+        message: JSON.stringify({
+          submissionId: answer.id,
+          repositoryUrl,
+        }),
+        producer: this.producer,
+      });
     }
     return answer;
   }
@@ -75,19 +84,5 @@ export class AnswerService {
 
   delete(id: string) {
     return this.answerRepository.delete(id);
-  }
-
-  sendChallengeToTopic(submissionId: string, repositoryUrl: string): void {
-    // rxjs 7+ fez o "toPromise" ficar deprecated, substituindo por este
-    // subscriber. Criei este método para facilitar o mock
-    firstValueFrom(
-      this.producer.send(
-        'challenge.correction',
-        JSON.stringify({
-          submissionId,
-          repositoryUrl,
-        }),
-      ),
-    );
   }
 }

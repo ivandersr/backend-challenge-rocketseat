@@ -4,6 +4,7 @@ import { Challenge } from './entities/challenge.entity';
 import { CreateChallengeInput } from './dto/create-challenge.input';
 import { UpdateChallengeInput } from './dto/update-challenge.input';
 import { ListChallengesArgs } from './dto/list-challenges.args';
+import { ChallengePaginatedResponse } from './dto/paginated-response';
 
 @Resolver(() => Challenge)
 export class ChallengeResolver {
@@ -16,7 +17,7 @@ export class ChallengeResolver {
     return this.challengeService.create(createChallengeInput);
   }
 
-  @Query(() => [Challenge], { name: 'challenges' })
+  @Query(() => ChallengePaginatedResponse, { name: 'challenges' })
   findAll(@Args() args: ListChallengesArgs) {
     return this.challengeService.findMany(args);
   }

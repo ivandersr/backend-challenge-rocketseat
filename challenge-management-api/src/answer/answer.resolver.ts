@@ -11,6 +11,7 @@ import { Answer } from './entities/answer.entity';
 import { CreateAnswerInput } from './dto/create-answer.input';
 import { ListAnswersArgs } from './dto/list-answers.args';
 import { ChallengeService } from '../challenge/challenge.service';
+import { AnswerPaginatedResponse } from './dto/paginated-response';
 
 @Resolver(() => Answer)
 export class AnswerResolver {
@@ -26,7 +27,7 @@ export class AnswerResolver {
     return this.answerService.create(createAnswerInput);
   }
 
-  @Query(() => [Answer], { name: 'answers' })
+  @Query(() => AnswerPaginatedResponse, { name: 'answers' })
   findAll(@Args() args: ListAnswersArgs) {
     return this.answerService.findMany(args);
   }

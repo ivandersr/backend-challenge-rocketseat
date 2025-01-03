@@ -71,8 +71,9 @@ describe('ChallengeService', () => {
     }
 
     const result = await service.findMany({});
-    expect(result).toHaveLength(3);
-    expect(result[0]).toMatchObject({
+    expect(result.total).toBe(3);
+    expect(result.data).toHaveLength(3);
+    expect(result.data[0]).toMatchObject({
       title: 'Challenge Title 1',
       description: 'Challenge Description 1',
     });
@@ -102,8 +103,9 @@ describe('ChallengeService', () => {
       limit: 2,
     });
 
-    expect(result).toHaveLength(1);
-    expect(result[0]).toMatchObject({
+    expect(result.data).toHaveLength(1);
+    expect(result.total).toBe(3);
+    expect(result.data[0]).toMatchObject({
       title: 'Challenge Title 3',
       description: 'Challenge Description 3',
     });
@@ -133,8 +135,8 @@ describe('ChallengeService', () => {
       description: 'filter',
     });
 
-    expect(result).toHaveLength(1);
-    expect(result[0]).toMatchObject({
+    expect(result.data).toHaveLength(1);
+    expect(result.data[0]).toMatchObject({
       title: 'Challenge Title 2 fiLter',
       description: 'Challenge Description 2 FiltER',
     });

@@ -3,6 +3,7 @@ import { AnswerRepository } from '../answer.repository';
 import { CreateAnswerRepositoryInput } from 'src/answer/dto/create-answer.repo.input';
 import { UpdateAnswerRepositoryInput } from 'src/answer/dto/update-answer.repo.input';
 import { ListAnswersRepositoryArgs } from 'src/answer/dto/List-answers.repo.args';
+import { AnswerPaginatedResponse } from 'src/answer/dto/paginated-response';
 
 export class AnswerFakeRepository implements AnswerRepository {
   public answers: Answer[] = [];
@@ -22,7 +23,9 @@ export class AnswerFakeRepository implements AnswerRepository {
     return answer;
   }
 
-  async findMany(args: ListAnswersRepositoryArgs): Promise<Answer[]> {
+  async findMany(
+    args: ListAnswersRepositoryArgs,
+  ): Promise<AnswerPaginatedResponse> {
     const { skip, take, ...filters } = args;
     let result = this.answers;
 
@@ -41,7 +44,10 @@ export class AnswerFakeRepository implements AnswerRepository {
         filterOps[filter](answer, filters[filter]),
       );
     }
-    return result.slice(skip, skip + take);
+    return {
+      total: result.length,
+      data: result.slice(skip, skip + take),
+    };
   }
 
   async update(input: UpdateAnswerRepositoryInput): Promise<Answer> {

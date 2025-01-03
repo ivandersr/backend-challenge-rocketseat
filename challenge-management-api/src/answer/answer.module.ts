@@ -3,10 +3,11 @@ import { AnswerService } from './answer.service';
 import { AnswerResolver } from './answer.resolver';
 import { ChallengeService } from '../challenge/challenge.service';
 import { AnswerPrismaRepository } from './repositories/implementations/answer.prisma.repository';
-import { ChallengePrismaRepository } from 'src/challenge/repositories/implementations/challenge.prisma.repository';
+import { ChallengePrismaRepository } from '../challenge/repositories/implementations/challenge.prisma.repository';
 import { AnswerConsumer } from './answer.consumer';
 import { ClientKafka, ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { sendMessageToTopic } from 'src/utils/send-to-topic';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     ChallengeService,
     { provide: 'AnswerRepository', useClass: AnswerPrismaRepository },
     { provide: 'ChallengeRepository', useClass: ChallengePrismaRepository },
+    { provide: 'sendMessage', useValue: sendMessageToTopic },
   ],
   controllers: [AnswerConsumer],
 })

@@ -24,13 +24,19 @@ describe('AnswerService', () => {
             subscribe: jest.fn(),
           },
         },
+        {
+          provide: 'sendMessage',
+          useValue: jest.fn(),
+        },
       ],
     }).compile();
 
+    jest.mock('../utils/send-to-topic');
     service = module.get<AnswerService>(AnswerService);
-    jest
-      .spyOn(service, 'sendChallengeToTopic')
-      .mockImplementationOnce(() => jest.fn());
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
   });
 
   it('should be able to create an answer to an existing challenge', async () => {
@@ -138,8 +144,8 @@ describe('AnswerService', () => {
     }
 
     const result = await service.findMany({});
-    expect(result).toHaveLength(5);
-    expect(result[0]).toMatchObject({
+    expect(result.total).toBe(5);
+    expect(result.data[0]).toMatchObject({
       challengeId: challenge.id,
       repositoryUrl: 'https://github.com/ivandersr',
       status: AnswerStatus.PENDING,
@@ -164,8 +170,9 @@ describe('AnswerService', () => {
       limit: 2,
     });
 
-    expect(result).toHaveLength(1);
-    expect(result[0]).toMatchObject({
+    expect(result.data).toHaveLength(1);
+    expect(result.total).toBe(5);
+    expect(result.data[0]).toMatchObject({
       challengeId: challenge.id,
       repositoryUrl: 'https://github.com/ivandersr',
       status: AnswerStatus.DONE,
@@ -190,8 +197,9 @@ describe('AnswerService', () => {
       status: AnswerStatus.PENDING,
     });
 
-    expect(result).toHaveLength(1);
-    expect(result[0]).toMatchObject({
+    expect(result.data).toHaveLength(1);
+    expect(result.total).toBe(1);
+    expect(result.data[0]).toMatchObject({
       status: AnswerStatus.PENDING,
     });
   });

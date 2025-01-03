@@ -4,6 +4,7 @@ import { CreateChallengeInput } from 'src/challenge/dto/create-challenge.input';
 import { UpdateChallengeInput } from 'src/challenge/dto/update-challenge.input';
 import { Injectable } from '@nestjs/common';
 import { ListChallengesRepoArgs as ListChallengesRepositoryArgs } from 'src/challenge/dto/list-challenges.repo.args';
+import { ChallengePaginatedResponse } from 'src/challenge/dto/paginated-response';
 
 @Injectable()
 export class ChallengeFakeRepository implements ChallengeRepository {
@@ -28,7 +29,9 @@ export class ChallengeFakeRepository implements ChallengeRepository {
     return this.challenges.find((challenge) => challenge.title === title);
   }
 
-  async findMany(args: ListChallengesRepositoryArgs): Promise<Challenge[]> {
+  async findMany(
+    args: ListChallengesRepositoryArgs,
+  ): Promise<ChallengePaginatedResponse> {
     const { skip, take, ...filters } = args;
     let result = this.challenges;
     for (const filter in filters) {
@@ -36,7 +39,7 @@ export class ChallengeFakeRepository implements ChallengeRepository {
         challenge[filter].toLowerCase().includes(filters[filter].toLowerCase()),
       );
     }
-    return result.slice(skip, skip + take);
+    return { total: result.length, data: result.slice(skip, skip + take) };
   }
 
   async update(input: UpdateChallengeInput): Promise<Challenge> {

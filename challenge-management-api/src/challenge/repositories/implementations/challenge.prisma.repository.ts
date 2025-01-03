@@ -1,11 +1,12 @@
-import { CreateChallengeInput } from 'src/challenge/dto/create-challenge.input';
-import { UpdateChallengeInput } from 'src/challenge/dto/update-challenge.input';
-import { Challenge } from 'src/challenge/entities/challenge.entity';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { parseFilters } from 'src/utils/parse-filters';
+import { CreateChallengeInput } from '../../dto/create-challenge.input';
+import { UpdateChallengeInput } from '../../dto/update-challenge.input';
+import { Challenge } from '../../entities/challenge.entity';
+import { PrismaService } from '../../../prisma/prisma.service';
+import { parseFilters } from '../../../utils/parse-filters';
 import { ChallengeRepository } from '../challenge.repository';
 import { Injectable } from '@nestjs/common';
-import { ListChallengesRepoArgs } from 'src/challenge/dto/list-challenges.repo.args';
+import { ListChallengesRepoArgs } from '../../dto/list-challenges.repo.args';
+import { ChallengePaginatedResponse } from 'src/challenge/dto/paginated-response';
 
 @Injectable()
 export class ChallengePrismaRepository implements ChallengeRepository {
@@ -23,7 +24,9 @@ export class ChallengePrismaRepository implements ChallengeRepository {
     return this.prisma.challenge.findFirst({ where: { title } });
   }
 
-  async findMany(args: ListChallengesRepoArgs): Promise<Challenge[]> {
+  async findMany(
+    args: ListChallengesRepoArgs,
+  ): Promise<ChallengePaginatedResponse> {
     const { skip, take, title, description } = args;
     const queryArgs = {
       skip,
@@ -41,8 +44,12 @@ export class ChallengePrismaRepository implements ChallengeRepository {
         },
       ]),
     };
+    const [challenges, count] = await this.prisma.$transaction([
+      this.prisma.challenge.findMany(queryArgs),
+      this.prisma.challenge.count({ where: queryArgs.where }),
+    ]);
 
-    return this.prisma.challenge.findMany(queryArgs);
+    return { total: count, data: challenges };
   }
 
   async update(input: UpdateChallengeInput): Promise<Challenge> {

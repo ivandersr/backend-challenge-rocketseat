@@ -13,6 +13,11 @@ type Answer {
   status: AnswerStatus!
 }
 
+type AnswerPaginatedResponse {
+  data: [Answer!]
+  total: Int!
+}
+
 """
 Status of an answer, comprising the values "Pending", "Error" and "Done".
 """
@@ -24,6 +29,11 @@ type Challenge {
   id: String!
   title: String!
   updatedAt: DateTime!
+}
+
+type ChallengePaginatedResponse {
+  data: [Challenge!]
+  total: Int!
 }
 
 input CreateAnswerInput {
@@ -49,9 +59,9 @@ type Mutation {
 }
 
 type Query {
-  answers(challengeId: String, endDate: DateTime, limit: Float, page: Float, startDate: DateTime, status: AnswerStatus): [Answer!]!
+  answers(challengeId: String, endDate: DateTime, limit: Float, page: Float, startDate: DateTime, status: AnswerStatus): AnswerPaginatedResponse!
   challenge(id: String!): Challenge!
-  challenges(description: String, limit: Float, page: Float, title: String): [Challenge!]!
+  challenges(description: String, limit: Float, page: Float, title: String): ChallengePaginatedResponse!
 }
 
 input UpdateChallengeInput {
